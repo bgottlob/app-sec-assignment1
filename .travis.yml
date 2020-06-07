@@ -1,1 +1,9 @@
 language: c
+os: linux
+dist: bionic
+compiler: gcc
+install: make get-deps
+jobs:
+  include:
+    - stage: test
+      script: make test && ./test
