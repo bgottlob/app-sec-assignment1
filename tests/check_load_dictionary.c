@@ -3,24 +3,25 @@
 #include <stdlib.h>
 #include "../dictionary.h"
 
+int count_lines(const char* dictionary_file) {
+  FILE *f = fopen(dictionary_file, "r");
+  if (f == NULL) {
+    printf("Error: %s could not be opened");
+    exit(EXIT_FAILURE);
+  }
+  int lines = 0;
+  for (char c = getc(f); c != EOF; c = getc(f)) {
+    if (c == '\n') { lines++; }
+  }
+  fclose(f);
+  return lines;
+}
+
 START_TEST(test_load_dictionary) {
-  char output[1000];
-  FILE *fp = popen("/bin/wc -l wordlist.txt", "r");
-  if (fp == NULL) {
-    printf("Failed to run wc -l\n" );
-    exit(1);
-  }
-
-  while (fgets(output, sizeof(output), fp) != NULL) {
-    printf("%s", output);
-  }
-
-  pclose(fp);
-
-  int expected = atoi(output);
-
+  const char *dictionary_file = "wordlist.txt";
+  int expected = count_lines(dictionary_file);
   node *hashtable[HASH_SIZE];
-  load_dictionary("wordlist.txt", hashtable);
+  load_dictionary(dictionary_file, hashtable);
 
   int actual = 0;
   for (int i = 0; i < HASH_SIZE; i++) {
