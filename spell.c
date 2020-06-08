@@ -37,3 +37,10 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
   fclose(fptr);
   return true;
 }
+
+bool check_word(const char* word, hashmap_t hashtable[]) {
+  for (node *curr = hashtable[hash_function(word)]; curr; curr = curr->next) {
+    if (strcmp(curr->word, word) == 0) { return true; }
+  }
+  return false;
+}

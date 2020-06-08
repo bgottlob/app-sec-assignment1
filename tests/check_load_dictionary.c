@@ -36,6 +36,17 @@ START_TEST(test_load_dictionary) {
 }
 END_TEST
 
+// TODO move this to its own file
+START_TEST(test_check_word) {
+  const char *dictionary_file = "wordlist.txt";
+  node *hashtable[HASH_SIZE];
+  load_dictionary(dictionary_file, hashtable);
+
+  ck_assert(check_word("word", hashtable));
+  ck_assert(!check_word("notaword", hashtable));
+}
+END_TEST
+
 Suite *spell_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -46,6 +57,7 @@ Suite *spell_suite(void) {
   tc_core = tcase_create("Core");
 
   tcase_add_test(tc_core, test_load_dictionary);
+  tcase_add_test(tc_core, test_check_word);
   suite_add_tcase(s, tc_core);
 
   return s;
