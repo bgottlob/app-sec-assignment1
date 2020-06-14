@@ -6,7 +6,7 @@
 int count_lines(const char* dictionary_file) {
   FILE *f = fopen(dictionary_file, "r");
   if (f == NULL) {
-    printf("Error: %s could not be opened");
+    printf("Error: %s could not be opened", dictionary_file);
     exit(EXIT_FAILURE);
   }
   int lines = 0;
