@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -38,11 +39,28 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
   return true;
 }
 
-bool check_word(const char* word, hashmap_t hashtable[]) {
+bool check_word_exact(const char* word, hashmap_t hashtable[]) {
   for (node *curr = hashtable[hash_function(word)]; curr; curr = curr->next) {
     if (strcmp(curr->word, word) == 0) { return true; }
   }
   return false;
+}
+
+void word_tolower(const char* word, char lower[]) {
+  int i;
+  for (i = 0; word[i]; i++) {
+    lower[i] = tolower(word[i]);
+  }
+  lower[i] = '\0';
+}
+
+bool check_word(const char* word, hashmap_t hashtable[]) {
+  if (check_word_exact(word, hashtable)) { return true; }
+
+  // If exact match of word is not found, check it lower cased
+  char lower[LENGTH + 1];
+  word_tolower(word, lower);
+  return check_word_exact(lower, hashtable);
 }
 
 int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
