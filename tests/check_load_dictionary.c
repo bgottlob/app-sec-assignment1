@@ -47,6 +47,25 @@ START_TEST(test_check_word) {
 }
 END_TEST
 
+// TODO move this to its own file
+START_TEST(test_check_words) {
+  const char *dictionary_file = "wordlist.txt";
+  node *hashtable[HASH_SIZE];
+  load_dictionary(dictionary_file, hashtable);
+
+  FILE *corpusfp = fopen("testcorpus.txt", "r");
+  char *misspelled[MAX_MISSPELLED];
+  int numMisspelled = check_words(corpusfp, hashtable, misspelled);
+  
+  ck_assert_int_eq(5, numMisspelled);
+  ck_assert(strcmp("sogn", misspelled[0]) == 0);
+  ck_assert(strcmp("skyn", misspelled[1]) == 0);
+  ck_assert(strcmp("betta", misspelled[2]) == 0);
+  ck_assert(strcmp("Teh", misspelled[3]) == 0);
+  ck_assert(strcmp("ovre", misspelled[4]) == 0);
+}
+END_TEST
+
 Suite *spell_suite(void) {
   Suite *s;
   TCase *tc_core;
@@ -58,6 +77,7 @@ Suite *spell_suite(void) {
 
   tcase_add_test(tc_core, test_load_dictionary);
   tcase_add_test(tc_core, test_check_word);
+  tcase_add_test(tc_core, test_check_words);
   suite_add_tcase(s, tc_core);
 
   return s;
