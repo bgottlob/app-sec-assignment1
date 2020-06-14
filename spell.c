@@ -44,3 +44,28 @@ bool check_word(const char* word, hashmap_t hashtable[]) {
   }
   return false;
 }
+
+int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
+  for (int i = 0; i < MAX_MISSPELLED; i++) {
+    misspelled[i] = NULL;
+  }
+
+  int num_misspelled = 0;
+  const char *DELIMITERS = " ,.?!/;:\"'\n";
+  const int MAX_LINE = 1000;
+  char line[MAX_LINE];
+  char *token;
+  while (fgets(line, MAX_LINE, fp) != NULL) {
+    token = strtok(line, DELIMITERS);
+    while (token != NULL) {
+      if (!check_word(token, hashtable)) {
+        misspelled[num_misspelled] = malloc(sizeof(char) * (LENGTH + 1));
+        strncpy(misspelled[num_misspelled], token, LENGTH + 1);
+
+        num_misspelled++;
+      }
+      token = strtok(NULL, DELIMITERS);
+    }
+  }
+  return num_misspelled;
+}
