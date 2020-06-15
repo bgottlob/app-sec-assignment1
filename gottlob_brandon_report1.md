@@ -180,3 +180,106 @@ Running suite(s): Spell
 ==81524==
 ==81524== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 ```
+
+### Fixing Memory Leaks
+
+The memory leaks revealed by Valgrind showed memory allocated by load_dictionary and check_words and used by the callers of those functions was not freed.
+Since the caller uses that memory, it is the caller's responsibility to free the memory.
+This commit adds functions for freeing memory allocated for hashtables and misspelled word lists.
+These functions were then called in the spell_check.c main method and the executable check test functions.
+
+No memory leaks occurred within spell.c library code.
+
+After fixing the memory leaks, this is the Valgrind output running the main function in `spell_check.c` after commit https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194:
+
+```
+$ valgrind -s --leak-check=full ./spell_check testcorpus.txt wordlist.txt
+==8482== Memcheck, a memory error detector
+==8482== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==8482== Using Valgrind-3.16.0.GIT and LibVEX; rerun with -h for copyright info
+==8482== Command: ./spell_check testcorpus.txt wordlist.txt
+==8482==
+Checking `wordlist.txt` against corpus `testcorpus.txt`
+5 words misspelled in `testcorpus.txt`
+==8482==
+==8482== HEAP SUMMARY:
+==8482==     in use at exit: 0 bytes in 0 blocks
+==8482==   total heap usage: 123,602 allocs, 123,602 frees, 6,931,542 bytes allocated
+==8482==
+==8482== All heap blocks were freed -- no leaks are possible
+==8482==
+==8482== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+```
+
+This is the output of Valgrind when running unit tests after commit https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194:
+
+```
+$ valgrind -s --leak-check=full ./test
+==8784== Memcheck, a memory error detector
+==8784== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==8784== Using Valgrind-3.16.0.GIT and LibVEX; rerun with -h for copyright info
+==8784== Command: ./test
+==8784==
+Running suite(s): load_dictionary
+==8785==
+==8785== HEAP SUMMARY:
+==8785==     in use at exit: 1,764 bytes in 65 blocks
+==8785==   total heap usage: 123,675 allocs, 123,610 frees, 6,937,474 bytes allocated
+==8785==
+==8785== LEAK SUMMARY:
+==8785==    definitely lost: 0 bytes in 0 blocks
+==8785==    indirectly lost: 0 bytes in 0 blocks
+==8785==      possibly lost: 0 bytes in 0 blocks
+==8785==    still reachable: 1,764 bytes in 65 blocks
+==8785==         suppressed: 0 bytes in 0 blocks
+==8785== Reachable blocks (those to which a pointer was found) are not shown.
+==8785== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==8785==
+==8785== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+ check_word
+==8790==
+==8790== HEAP SUMMARY:
+==8790==     in use at exit: 1,856 bytes in 68 blocks
+==8790==   total heap usage: 123,688 allocs, 123,620 frees, 6,946,056 bytes allocated
+==8790==
+==8790== LEAK SUMMARY:
+==8790==    definitely lost: 0 bytes in 0 blocks
+==8790==    indirectly lost: 0 bytes in 0 blocks
+==8790==      possibly lost: 0 bytes in 0 blocks
+==8790==    still reachable: 1,856 bytes in 68 blocks
+==8790==         suppressed: 0 bytes in 0 blocks
+==8790== Reachable blocks (those to which a pointer was found) are not shown.
+==8790== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==8790==
+==8790== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+ check_words
+==8791==
+==8791== HEAP SUMMARY:
+==8791==     in use at exit: 2,423 bytes in 72 blocks
+==8791==   total heap usage: 123,719 allocs, 123,647 frees, 6,964,259 bytes allocated
+==8791==
+==8791== LEAK SUMMARY:
+==8791==    definitely lost: 0 bytes in 0 blocks
+==8791==    indirectly lost: 0 bytes in 0 blocks
+==8791==      possibly lost: 0 bytes in 0 blocks
+==8791==    still reachable: 2,423 bytes in 72 blocks
+==8791==         suppressed: 0 bytes in 0 blocks
+==8791== Reachable blocks (those to which a pointer was found) are not shown.
+==8791== To see them, rerun with: --leak-check=full --show-leak-kinds=all
+==8791==
+==8791== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+100%: Checks: 3, Failures: 0, Errors: 0
+==8784==
+==8784== HEAP SUMMARY:
+==8784==     in use at exit: 0 bytes in 0 blocks
+==8784==   total heap usage: 123 allocs, 123 frees, 42,655 bytes allocated
+==8784==
+==8784== All heap blocks were freed -- no leaks are possible
+==8784==
+==8784== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+```
+
+According to [section 4.11 of the Check library documentation](https://libcheck.github.io/check/doc/check_html/check_4.html#Finding-Memory-Leaks), the check test executor processes do not have any way of freeing all internal memory when the tests finish.
+Therefore, Valgrind will always report still reachable bytes when running Check tests.
+When I ran Valgrind with additional trace flags, I saw that all memory that was still reachable was allocated by `libcheck`.
+This, along with the Valgrind not reporting any memory issues in the `spell_check` executable gives me confidence that my code does not have any memory leaks.
