@@ -3,6 +3,7 @@ CFLAGS=-I.
 DEPS=dictionary.h
 OBJ=spell.o dictionary.o
 CHECKFLAGS=$(shell pkg-config --cflags --libs check)
+TESTDIR=tests
 
 get-deps:
 	sudo apt-get update && sudo apt-get install check
@@ -16,5 +17,5 @@ spell_check: $(OBJ) spell_check.c
 clean:
 	rm -f *.o spell_check
 
-test: $(OBJ) tests/check_load_dictionary.c
+test: $(OBJ) $(TESTDIR)/*
 	$(CC) -o $@ $^ $(CFLAGS) $(CHECKFLAGS)
