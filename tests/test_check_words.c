@@ -1,6 +1,7 @@
 #include <check.h>
 #include <stdio.h>
 #include "../dictionary.h"
+#include "../free_structs.h"
 #include "test_suites.h"
 
 START_TEST(test_check_words) {
@@ -18,6 +19,9 @@ START_TEST(test_check_words) {
   ck_assert(strcmp("betta", misspelled[2]) == 0);
   ck_assert(strcmp("Teh", misspelled[3]) == 0);
   ck_assert(strcmp("ovre", misspelled[4]) == 0);
+
+  free_hashtable(hashtable);
+  free_misspelled(misspelled);
 }
 END_TEST
 

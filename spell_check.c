@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "dictionary.h"
+#include "free_structs.h"
 
 int main(int argc, char **argv) {
   const char *corpus = NULL;
@@ -21,9 +22,12 @@ int main(int argc, char **argv) {
     node *hashtable[HASH_SIZE];
     load_dictionary(dictionary, hashtable);
     char *misspelled[MAX_MISSPELLED];
-    int numMisspelled = check_words(corpusfp, hashtable, misspelled);
+    int num_misspelled = check_words(corpusfp, hashtable, misspelled);
     fclose(corpusfp);
 
-    printf("%d words misspelled in `%s`\n", numMisspelled, corpus);
+    printf("%d words misspelled in `%s`\n", num_misspelled, corpus);
+
+    free_hashtable(hashtable);
+    free_misspelled(misspelled);
   }
 }

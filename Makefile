@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-I.
-DEPS=dictionary.h
+DEPS=dictionary.h free_structs.h
 OBJ=spell.o dictionary.o
 CHECKFLAGS=$(shell pkg-config --cflags --libs check)
 TESTDIR=tests

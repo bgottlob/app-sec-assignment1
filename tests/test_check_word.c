@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../dictionary.h"
+#include "../free_structs.h"
 #include "test_suites.h"
 
 START_TEST(test_check_word) {
@@ -11,6 +12,8 @@ START_TEST(test_check_word) {
 
   ck_assert(check_word("word", hashtable));
   ck_assert(!check_word("notaword", hashtable));
+
+  free_hashtable(hashtable);
 }
 END_TEST
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "dictionary.h"
+#include "free_structs.h"
 
 bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
   FILE *fptr = fopen(dictionary_file, "r");
@@ -37,6 +38,22 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
   }
   fclose(fptr);
   return true;
+}
+
+void free_hashtable(hashmap_t hashtable[]) {
+  for (int i = 0; i < HASH_SIZE; i++) {
+    node *curr = hashtable[i];
+    while (curr) {
+      // Get pointer to next node before current is freed
+      node *next = curr->next;
+
+      // Free current node
+      curr->next = NULL;
+      free(curr);
+
+      curr = next;
+    }
+  }
 }
 
 bool check_word_exact(const char* word, hashmap_t hashtable[]) {
@@ -86,4 +103,13 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
     }
   }
   return num_misspelled;
+}
+
+void free_misspelled(char * misspelled[]) {
+  for (int i = 0; i < MAX_MISSPELLED; i++) {
+    if (misspelled[i]) {
+      free(misspelled[i]);
+      misspelled[i] = NULL;
+    }
+  }
 }

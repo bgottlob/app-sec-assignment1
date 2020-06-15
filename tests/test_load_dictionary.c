@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../dictionary.h"
+#include "../free_structs.h"
 #include "test_suites.h"
 
 int count_lines(const char* dictionary_file) {
@@ -34,6 +35,8 @@ START_TEST(test_load_dictionary) {
   }
 
   ck_assert_int_eq(expected, actual);
+
+  free_hashtable(hashtable);
 }
 END_TEST
 
