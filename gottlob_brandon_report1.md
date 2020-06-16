@@ -283,3 +283,14 @@ According to [section 4.11 of the Check library documentation](https://libcheck.
 Therefore, Valgrind will always report still reachable bytes when running Check tests.
 When I ran Valgrind with additional trace flags, I saw that all memory that was still reachable was allocated by `libcheck`.
 This, along with the Valgrind not reporting any memory issues in the `spell_check` executable gives me confidence that my code does not have any memory leaks.
+
+## Additional Tests
+Additional tests and bug fixes were added in this commit: https://github.com/bgottlob/app-sec-assignment1/commit/c7beb33deb00fb62a86cb1c89c4c46d5d3249cdc
+
+The additional tests cover scenarios where tokens are strings whose only characters are digits or special characters, and to verify that words split by delimiters are considered to be spelled correctly.
+
+These tests found two bugs:
+
+1. Strings with no alphabetic characters were considered misspelled
+2. Hyphenated strings were evaluated as one misspelled word rather than
+   as multiple words
