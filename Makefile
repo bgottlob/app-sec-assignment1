@@ -6,7 +6,7 @@ CHECKFLAGS=$(shell pkg-config --cflags --libs check)
 TESTDIR=tests
 
 get-deps:
-	sudo apt-get update && sudo apt-get install check
+	sudo apt-get update && sudo apt-get install check valgrind
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
