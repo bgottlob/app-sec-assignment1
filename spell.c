@@ -71,7 +71,17 @@ void word_tolower(const char* word, char lower[]) {
   lower[i] = '\0';
 }
 
+// Return true if the word has at least one letter
+bool has_letter(const char* str) {
+  for (int i = 0; str[i] != 0; i++) {
+    char lower = tolower(str[i]);
+    if (lower >= 'a' && lower <= 'z') { return true; }
+  }
+  return false;
+}
+
 bool check_word(const char* word, hashmap_t hashtable[]) {
+  if (!has_letter(word)) { return true; }
   if (check_word_exact(word, hashtable)) { return true; }
 
   // If exact match of word is not found, check it lower cased
@@ -86,7 +96,7 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
   }
 
   int num_misspelled = 0;
-  const char *DELIMITERS = " ,.?!/;:\"'\n";
+  const char *DELIMITERS = " ,.?!/-;:\"'\n";
   const int MAX_LINE = 1000;
   char line[MAX_LINE];
   char *token;

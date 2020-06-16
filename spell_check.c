@@ -25,7 +25,11 @@ int main(int argc, char **argv) {
     int num_misspelled = check_words(corpusfp, hashtable, misspelled);
     fclose(corpusfp);
 
-    printf("%d words misspelled in `%s`\n", num_misspelled, corpus);
+    printf("%d words misspelled in `%s`:\n", num_misspelled, corpus);
+
+    for (int i = 0; i < num_misspelled; i++) {
+      printf("\t%s\n", misspelled[i]);
+    }
 
     free_hashtable(hashtable);
     free_misspelled(misspelled);
