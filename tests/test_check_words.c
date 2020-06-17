@@ -61,6 +61,27 @@ START_TEST(test_check_words_numeric) {
 }
 END_TEST
 
+START_TEST(test_check_words_longest) {
+  const char *dictionary_file = "tests/sample_dictionaries/longest_wordlist.txt";
+  node *hashtable[HASH_SIZE];
+  load_dictionary(dictionary_file, hashtable);
+
+  FILE *corpusfp = fopen("tests/samples/test_longest_word.txt", "r");
+  char *misspelled[MAX_MISSPELLED];
+  int num_misspelled = check_words(corpusfp, hashtable, misspelled);
+
+  // Tests that digit-only strings are words, even when delimiters split them
+  ck_assert_int_eq(1, num_misspelled);
+  ck_assert_str_eq(
+    "pneumonoultramicroscopicsilicovolcanoconiosix",
+    misspelled[0]
+  );
+
+  free_hashtable(hashtable);
+  free_misspelled(misspelled);
+}
+END_TEST
+
 Suite *check_words_suite(void) {
   Suite *s = suite_create("check_words");
   TCase *tc_core = tcase_create("Core");
@@ -68,6 +89,7 @@ Suite *check_words_suite(void) {
   tcase_add_test(tc_core, test_check_words_simple);
   tcase_add_test(tc_core, test_check_words_delimiters);
   tcase_add_test(tc_core, test_check_words_numeric);
+  tcase_add_test(tc_core, test_check_words_longest);
 
   suite_add_tcase(s, tc_core);
 
