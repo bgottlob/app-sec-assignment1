@@ -8,4 +8,4 @@ jobs:
     - stage: test
       script: make test && ./test
     - stage: leak-check
-      script: make spell_check && make test && valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./spell_check testcorpus.txt wordlist.txt && valgrind --leak-check=full --errors-for-leak-kinds=definite,indirect,possible --error-exitcode=1 ./test
+      script: make spell_check && make test && valgrind --leak-check=full --errors-for-leak-kinds=all --error-exitcode=1 ./spell_check tests/samples/testcorpus.txt wordlist.txt && valgrind --leak-check=full --errors-for-leak-kinds=definite,indirect,possible --error-exitcode=1 ./test
