@@ -17,5 +17,5 @@ spell_check: $(OBJ) spell_check.c
 clean:
 	rm -f *.o spell_check
 
-test: $(OBJ) $(TESTDIR)/*
+test: $(OBJ) $(TESTDIR)/*.c $(TESTDIR)/*.h
 	$(CC) -o $@ $^ $(CFLAGS) $(CHECKFLAGS)
