@@ -1,4 +1,5 @@
 CC=gcc
+AFLCC=afl-gcc
 CFLAGS=-I.
 DEPS=dictionary.h free_structs.h
 OBJ=spell.o dictionary.o
@@ -15,7 +16,10 @@ spell_check: $(OBJ) spell_check.c
 	$(CC) -o $@ $^ $(CFLAGS)
 
 clean:
-	rm -f *.o spell_check
+	rm -f *.o spell_check test spell_check_fuzz
 
 test: $(OBJ) $(TESTDIR)/*.c $(TESTDIR)/*.h
 	$(CC) -o $@ $^ $(CFLAGS) $(CHECKFLAGS)
+
+spell_check_fuzz: $(OBJ) spell_check.c
+	$(AFLCC) -o $@ $^ $(CFLAGS)
