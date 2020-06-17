@@ -9,7 +9,7 @@ START_TEST(test_check_words_simple) {
   node *hashtable[HASH_SIZE];
   load_dictionary(dictionary_file, hashtable);
 
-  FILE *corpusfp = fopen("testcorpus.txt", "r");
+  FILE *corpusfp = fopen("tests/samples/testcorpus.txt", "r");
   char *misspelled[MAX_MISSPELLED];
   int num_misspelled = check_words(corpusfp, hashtable, misspelled);
   
@@ -30,7 +30,7 @@ START_TEST(test_check_words_delimiters) {
   node *hashtable[HASH_SIZE];
   load_dictionary(dictionary_file, hashtable);
 
-  FILE *corpusfp = fopen("test_special_chars_corpus.txt", "r");
+  FILE *corpusfp = fopen("tests/samples/test_special_chars_corpus.txt", "r");
   char *misspelled[MAX_MISSPELLED];
   int num_misspelled = check_words(corpusfp, hashtable, misspelled);
 
@@ -49,7 +49,7 @@ START_TEST(test_check_words_numeric) {
   node *hashtable[HASH_SIZE];
   load_dictionary(dictionary_file, hashtable);
 
-  FILE *corpusfp = fopen("test_numeric_chars_corpus.txt", "r");
+  FILE *corpusfp = fopen("tests/samples/test_numeric_chars_corpus.txt", "r");
   char *misspelled[MAX_MISSPELLED];
   int num_misspelled = check_words(corpusfp, hashtable, misspelled);
 
