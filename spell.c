@@ -20,20 +20,24 @@ bool load_dictionary(const char* dictionary_file, hashmap_t hashtable[]) {
   while (fgets(word, sizeof(word), fptr) != NULL) {
     word[strcspn(word, "\n")] = 0; // Remove trailing newline
 
-    node *new_node = malloc(sizeof(node));
-    strncpy(new_node->word, word, LENGTH + 1);
-    new_node->next = NULL;
-
     int hash = hash_function(word);
-    node *list = hashtable[hash];
 
-    node *curr = list;
-    if (curr) { // Traverse to the end of the list then append current word
-      while (curr->next) { curr = curr->next; }
-      curr->next = new_node;
-      hashtable[hash] = list;
-    } else { // This word is the first in the hashmap list
-      hashtable[hash] = new_node;
+    // If the hash is invalid, don't add this word to the dictionary
+    if (hash >= 0 && hash < HASH_SIZE) {
+      node *new_node = malloc(sizeof(node));
+      strncpy(new_node->word, word, LENGTH + 1);
+      new_node->next = NULL;
+
+      node *list = hashtable[hash];
+
+      node *curr = list;
+      if (curr) { // Traverse to the end of the list then append current word
+        while (curr->next) { curr = curr->next; }
+        curr->next = new_node;
+        hashtable[hash] = list;
+      } else { // This word is the first in the hashmap list
+        hashtable[hash] = new_node;
+      }
     }
   }
   fclose(fptr);
@@ -57,18 +61,20 @@ void free_hashtable(hashmap_t hashtable[]) {
 }
 
 bool check_word_exact(const char* word, hashmap_t hashtable[]) {
-  for (node *curr = hashtable[hash_function(word)]; curr; curr = curr->next) {
-    if (strcmp(curr->word, word) == 0) { return true; }
+  int hash = hash_function(word);
+  // Invalid hash, word can't be in the hashmap
+  if (hash >= 0 && hash < HASH_SIZE) {
+    for (node *curr = hashtable[hash]; curr; curr = curr->next) {
+      if (strcmp(curr->word, word) == 0) { return true; }
+    }
   }
   return false;
 }
 
-void word_tolower(const char* word, char lower[]) {
-  int i;
-  for (i = 0; word[i]; i++) {
-    lower[i] = tolower(word[i]);
+void word_tolower(char lower[]) {
+  for (int i = 0; lower[i]; i++) {
+    lower[i] = tolower(lower[i]);
   }
-  lower[i] = '\0';
 }
 
 // Return true if the word has at least one letter
@@ -81,12 +87,14 @@ bool has_letter(const char* str) {
 }
 
 bool check_word(const char* word, hashmap_t hashtable[]) {
+  if (strlen(word) > LENGTH) { return false; }
   if (!has_letter(word)) { return true; }
   if (check_word_exact(word, hashtable)) { return true; }
 
   // If exact match of word is not found, check it lower cased
   char lower[LENGTH + 1];
-  word_tolower(word, lower);
+  strncpy(lower, word, LENGTH + 1);
+  word_tolower(lower);
   return check_word_exact(lower, hashtable);
 }
 
@@ -104,8 +112,10 @@ int check_words(FILE* fp, hashmap_t hashtable[], char * misspelled[]) {
     token = strtok(line, DELIMITERS);
     while (token != NULL) {
       if (!check_word(token, hashtable)) {
-        misspelled[num_misspelled] = malloc(sizeof(char) * (LENGTH + 1));
-        strncpy(misspelled[num_misspelled], token, LENGTH + 1);
+        // Preserve original token length when storing it in misspelled list
+        unsigned int token_len = strlen(token) + 1;
+        misspelled[num_misspelled] = malloc(sizeof(char) * token_len);
+        strncpy(misspelled[num_misspelled], token, token_len);
 
         num_misspelled++;
       }

@@ -40,11 +40,38 @@ START_TEST(test_load_dictionary) {
 }
 END_TEST
 
+/* 
+ * Use a testcase that was found by the AFL fuzzer that previously caused a
+ * seg fault due to hash_function being evaluated to a negative number
+ */
+START_TEST(test_load_dictionary_segfault) {
+  const char *dictionary_file = "tests/samples/shrunk_segfault_testcase.txt";
+  node *hashtable[HASH_SIZE];
+  load_dictionary(dictionary_file, hashtable);
+
+  int actual = 0;
+  for (int i = 0; i < HASH_SIZE; i++) {
+    node *curr = hashtable[i];
+    while (curr) {
+      curr = curr->next;
+      actual++;
+    }
+  }
+
+  // The file contains one word that causes the hash_function to evaluate to
+  // an invalid negative number. The word is ignored in that case
+  ck_assert_int_eq(0, actual);
+
+  free_hashtable(hashtable);
+}
+END_TEST
+
 Suite *load_dictionary_suite(void) {
   Suite *s = suite_create("load_dictionary");
   TCase *tc_core = tcase_create("Core");
 
   tcase_add_test(tc_core, test_load_dictionary);
+  tcase_add_test(tc_core, test_load_dictionary_segfault);
 
   suite_add_tcase(s, tc_core);
 
