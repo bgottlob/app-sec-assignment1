@@ -294,3 +294,125 @@ These tests found two bugs:
 1. Strings with no alphabetic characters were considered misspelled
 2. Hyphenated strings were evaluated as one misspelled word rather than
    as multiple words
+
+## Fuzzing
+
+I fuzzed the code by running four instances of AFL in parallel for nearly four hours and through numerous cycles.
+The full results of the fuzzing are contained in the `afl-findings` directory.
+Fuzzing exposed two bugs: one causing a stack smashing crash and the other causing a segmentation fault.
+
+### First Bug - Stack Smashing
+
+Multiple parallel instances of AFL found testcases that caused crashes.
+The first I checked was in the `crashes` directory of the `fuzzer02` instance.
+
+To debug, I utilized `afl-tmin` tool, which shrinks testcases into their smallest and simplest possible forms to reproduce the same issue.
+The testcase from shrinking looked like the following:
+```
+00000000000000000000000000000000000000000000000000000000r
+```
+
+Running this testcase through the `spell_check` binary produced by my main function in `spell_check.c` showed the same stack smashing error:
+```
+$ ./spell_check tests/samples/shrunk_crash_testcase.txt wordlist.txt
+Checking `wordlist.txt` against corpus `tests/samples/shrunk_crash_testcase.txt`
+*** stack smashing detected ***: terminated
+Aborted (core dumped)
+```
+
+After a few online searches, I discovered that `gcc` adds canaries for protection against buffer overflow attacks.
+A stack smashing crash occurs when a canary is overwritten and a stack check is performed.
+
+To help figure out where in the source code the stack smashing crash is triggered, I ran my binary through Valgrind and got the following output:
+
+```
+minimizess terminating with default action of signal 6 (SIGABRT): dumping core
+==318928==    at 0x48C3355: raise (in /usr/lib/libc-2.31.so)
+==318928==    by 0x48AC852: abort (in /usr/lib/libc-2.31.so)
+==318928==    by 0x4906877: __libc_message (in /usr/lib/libc-2.31.so)
+==318928==    by 0x4996889: __fortify_fail (in /usr/lib/libc-2.31.so)
+==318928==    by 0x4996853: __stack_chk_fail (in /usr/lib/libc-2.31.so)
+==318928==    by 0x109632: check_word (spell.c:92)
+==318928==    by 0x109766: check_words (spell.c:109)
+==318928==    by 0x109A3A: main (spell_check.c:25)
+```
+
+Line 92 of `spell.c` led me to the closing bracket of the `check_word` function.
+Adding in some print statements as well showed me that the crash was occurring after the function finished executing but before the caller in the `check_words` function regained control and received the returned value of `check_word`.
+This led me to believe the error occurred when the stack frame for the `check_word` function that had just finished executing was being deallocated, meaning some memory allocated on `check_word`'s stack was likely the cause.
+
+The only new memory allocated in `check_word` is the `lower` array, which is used to hold the lower cased word:
+
+``` c
+char lower[LENGTH + 1];
+```
+
+Understanding that the input from the shrunk testcase is a token that is 57 characters long and `LENGTH + 1` evaluates to 46, it became clear that not enough memory was being allocated to `lower`.
+The `word_tolower` function was looping based on the length of the word, not the length of this lower array, so a word string (`str`) that is larger than what `lower` can hold will cause this loop to exceed `lower`'s memory boundary
+
+``` c
+for (i = 0; str[i] != 0; i++) {
+  char lower = tolower(str[i]);
+  if (lower >= 'a' && lower <= 'z') { return true; }
+}
+```
+
+
+The fix checks if the word exceeds the maximum word length in the dictionary.
+If so, the word cannot possibly be spelled correctly, so false is returned.
+
+``` c
+if (strlen(word) > LENGTH) { return false; }
+```
+
+For added safety `strncpy` is now used to copy the word into `lower`, then only the `lower` string is passed to the `word_tolower`.
+This way, there will be no mismatches in array length since it is limited at `LENGTH + 1`.
+
+``` c
+strncpy(lower, word, LENGTH + 1);
+```
+
+After fixing the bug and verifying manually that the fixes work, I reran the existing unit tests, then added a unit test to `tests/test_check_words.c` for the shrunk testcase that caused the crash before the fix.
+
+### Second Bug - Invalid Hash Value
+
+After fixing the first bug, I tested the crashing input that was found by fuzzing by fuzzer03 on a different processor core.
+I started again by shrinking the testcase and running it through my `spell_check` binary.
+This error from the program was a segmentation fault, so I then ran it through Valgrind.
+Valgrind presented a lot of output, but I found this to be the most helpful:
+
+```
+==336760== Invalid read of size 1
+==336760==    at 0x49E49A0: __strcmp_avx2 (in /usr/lib/libc-2.31.so)
+==336760==    by 0x1094CD: check_word_exact (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x109617: check_word (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x109771: check_words (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x109A57: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==336760==  Address 0x6f746e616b2f6c61 is not stack'd, malloc'd or (recently) free'd
+```
+
+This pointed me to the `check_word_exact` function.
+Having just fixed an array indexing bug, I looked at the only array access in `check_word_exact`:
+
+``` c
+hashtable[hash_function(hash)]
+```
+
+I was clearly assuming `hash_function` would always return me a valid value between 0 and `HASH_SIZE - 1`.
+I inspected the shrunk testcase file, which contained some strange-looking non-ASCII characters.
+When printing their integer values out in C, I saw that they had the value `-70` and caused the `hash_function` to return a negative number.
+
+To fix this, I added this check to `check_word_exact`:
+```
+if (hash >= 0 && hash < HASH_SIZE)
+```
+
+I also added this after the call to `hash_function` call in `load_dictionary` so the same problem cannot occur there.
+Like for the first bug, I added this shrunk testcase as a unit test, except this time for both `check_words` and `load_dictionary`.
+
+### After the Bug Fixes
+
+This commit contains fixes to both of the bugs found from fuzzing: https://github.com/bgottlob/app-sec-assignment1/commit/d2b42a817ce8c503676db2b813dc849e182fbde0
+After making this commit, I ran four parallel AFL instances on the changes.
+After running for nearly two hours with many completed cycles, there were no crashes or hangs.
+The results of this second round of fuzzing are contained in the `afl-findings-after-fixes` directory.
