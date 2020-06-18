@@ -12,7 +12,7 @@ This assignment implements a simple spell checker in C.
 * `wordlist.txt` - output of `aspell` used as a dictionary
 * `tests` - contains source code for unit tests
 * `tests/samples` - contains sample corpus files that can be checked for misspellings.
-* `afl-findings` and `afl-findings-after-fixes` - results of running the [AFL](https://lcamtuf.coredump.cx/afl/) fuzzer; for more details see [the report](gottlob_brandon_report1.md)
+* `afl-findings`, `afl-findings-after-fixes`, and `afl-findings-dictionary` - results of running the [AFL](https://lcamtuf.coredump.cx/afl/) fuzzer; for more details see [the report](gottlob_brandon_report1.md)
 
 ## Running the Spell Checker
 

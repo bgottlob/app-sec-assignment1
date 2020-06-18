@@ -12,7 +12,7 @@ header-includes: |
     \usepackage{fancyhdr}
     \pagestyle{fancy}
     \fancyhead[LO,LE]{Brandon Gottlob}
-    \fancyhead[RO,RE]{Problem Set \#2}
+    \fancyhead[RO,RE]{Assignment 1 Report}
     \fancyfoot[LO,LE]{\today}
 pagestyle: empty
 lang: en-US
@@ -336,7 +336,9 @@ The additional tests cover scenarios where tokens are strings whose only charact
 ## Fuzzing
 
 I fuzzed the code by running four instances of AFL in parallel for nearly four hours and through numerous cycles.
-The full results of the fuzzing are contained in the `afl-findings` directory.
+For this first round of fuzzing, I utilized the `tests/afl-testcase/testcase.txt` file as the base testcase.
+The fuzzing was performed with the corpus file as the mutating input, with the dictionary file kept the same on each run with `wordlist.txt`.
+The full results are contained in the `afl-findings` directory.
 Fuzzing exposed two bugs: one causing a stack smashing crash and the other causing a segmentation fault.
 
 ### First Bug - Stack Smashing
@@ -458,3 +460,30 @@ This commit contains fixes to both of the bugs found from fuzzing: [https://gith
 After making this commit, I ran four parallel AFL instances on the changes.
 After running for nearly two hours with many completed cycles, there were no crashes or hangs.
 The results of this second round of fuzzing are contained in the `afl-findings-after-fixes` directory.
+
+### Fuzzing a Dictionary File
+
+After making the bug fixes, I fuzzed by keeping the corpus file constant as `tests/afl-testcases/testcase.txt` and utilized `tests/afl-testcase-dictionary/wordlist.txt` as a seed for fuzzing mutations.
+This dictionary file is much smaller than `wordlist.txt` to improve performance of the fuzzing.
+Ultimately, this proved to be very useful in fuzzing comprehensively very quickly, as AFL performed 1000 full cycles on a single processor core in less than 10 minutes.
+The full results of this round of fuzzing are located in `afl-findings-dictionary`.
+There were two inputs that AFL detected as program hangs, but when running them through my program manually, they returned in no more than two seconds.
+The hangs seem to have been false positives, and can be safely ignored, and thus there were no bugs that were found as part of this round of fuzzing
+This gave me extra coverage over fuzzing inputs into the `load_dictionary` function.
+
+## Avoiding Similar Bugs in the Future
+
+The bugs detected by unit tests were special cases that I did not consider in my initial implementation.
+Since unit tests exist for those cases, they should not resurface without the CI process catching them.
+
+Fuzzing exposed two bugs, both of which were caused by out-of-bounds array indexing.
+While creating new code, I need to more carefully consider the range of values an integer value can take when I use it to index an array, and be especially careful when dynamically allocated memory is involved.
+Any untrusted array bounds values need to be validated before using them to index an array.
+The path to trusting a value would need to involve thoroughly unit testing the functions that generate them.
+
+Fuzzing proved to be an excellent tool for exposing this class of bugs.
+However, it is not simple to integrate fuzzing into a Travis CI pipeline as it is to do so for unit tests.
+The nature of fuzzing is dynamic and requires a judgement call to know when to stop.
+Dedicated cloud hardware for running fuzzer jobs could be a good solution for creating fuzzing jobs in CI.
+Even with that available, I have seen that fuzzing can have false positives when it comes to hanging as well.
+Given these problems, fuzzing can run locally when a significant code change (or set of changes) is made, since its potentially high cost would add a lot of overhead to CI if done with every single code change.
