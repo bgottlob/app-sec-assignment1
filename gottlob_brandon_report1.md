@@ -487,3 +487,8 @@ The nature of fuzzing is dynamic and requires a judgement call to know when to s
 Dedicated cloud hardware for running fuzzer jobs could be a good solution for creating fuzzing jobs in CI.
 Even with that available, I have seen that fuzzing can have false positives when it comes to hanging as well.
 Given these problems, fuzzing can run locally when a significant code change (or set of changes) is made, since its potentially high cost would add a lot of overhead to CI if done with every single code change.
+
+As a lower overhead memory safety check, I have a separate Travis CI stage that runs Valgrind on the `./spell_check` and `./test` executables.
+If memory leaks are found, the CI stage will fail.
+An exception is made for the `./test` executable, due to the memory deallocation limitation with the Check library discussed previously.
+Clearly, Valgrind will not detect all of the memory access issues that fuzzing can find, but it is easy to run in CI against every code change.

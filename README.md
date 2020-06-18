@@ -11,6 +11,7 @@ This assignment implements a simple spell checker in C.
 * `dictionary.h` and `dictionary.c` - code provided by the assignment prompt
 * `wordlist.txt` - output of `aspell` used as a dictionary
 * `tests` - contains source code for unit tests
+* `free_structs.h` - header file for functions that free memory of data structures; created in lieu of editing `dictionary.h`
 * `tests/samples` - contains sample corpus files that can be checked for misspellings.
 * `afl-findings`, `afl-findings-after-fixes`, and `afl-findings-dictionary` - results of running the [AFL](https://lcamtuf.coredump.cx/afl/) fuzzer; for more details see [the report](gottlob_brandon_report1.md)
 
