@@ -1,10 +1,30 @@
+---
+documentclass: extarticle
+author: Brandon Gottlob
+fontsize: 13pt
+linestretch: 2 
+geometry: margin=0.75in
+indent: true
+header-includes: |
+    \usepackage{amsmath}
+    \usepackage{amssymb}
+    \usepackage{ifsym}
+    \usepackage{fancyhdr}
+    \pagestyle{fancy}
+    \fancyhead[LO,LE]{Brandon Gottlob}
+    \fancyhead[RO,RE]{Problem Set \#2}
+    \fancyfoot[LO,LE]{\today}
+pagestyle: empty
+lang: en-US
+---
+
 # Assignment 1
 
 ## Repository Link
 
-https://github.com/bgottlob/app-sec-assignment1
+[https://github.com/bgottlob/app-sec-assignment1](https://github.com/bgottlob/app-sec-assignment1)
 
-Tag for initial implementation: https://github.com/bgottlob/app-sec-assignment1/releases/tag/v0.1
+\noindent Tag for initial implementation: [https://github.com/bgottlob/app-sec-assignment1/releases/tag/v0.1](https://github.com/bgottlob/app-sec-assignment1/releases/tag/v0.1)
 
 ## Description of Program
 
@@ -49,9 +69,9 @@ Any memory that is allocated dynamically using `malloc` is allocated for the cal
 I do not suspect there will be any major memory allocation bugs that have not been caught while initally writing this code, but there may be some minor ones since manual memory allocation is error prone in general.
 
 ## Valgrind Output
-All of the following Valgrind output was run against the source code for the initial implementation tag: https://github.com/bgottlob/app-sec-assignment1/releases/tag/v0.1
+All of the following Valgrind output was run against the source code for the initial implementation tag: [https://github.com/bgottlob/app-sec-assignment1/releases/tag/v0.1](https://github.com/bgottlob/app-sec-assignment1/releases/tag/v0.1)
 
-Valgrind output running the main function in `spell_check.c`:
+\noindent Valgrind output running the main function in `spell_check.c`:
 
 ```
 $ valgrind -s --leak-check=full ./spell_check testcorpus.txt wordlist.txt
@@ -69,13 +89,18 @@ Checking `wordlist.txt` against corpus `testcorpus.txt`
 ==81080== 
 ==81080== 230 bytes in 5 blocks are definitely lost in loss record 1 of 3
 ==81080==    at 0x483977F: malloc (vg_replace_malloc.c:307)
-==81080==    by 0x109642: check_words (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
-==81080==    by 0x109874: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==81080==    by 0x109642: check_words (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
+==81080==    by 0x109874: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
 ==81080== 
-==81080== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are definitely lost in loss record 3 of 3
+==81080== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are
+definitely lost in loss record 3 of 3
 ==81080==    at 0x483977F: malloc (vg_replace_malloc.c:307)
-==81080==    by 0x1092BF: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
-==81080==    by 0x109854: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==81080==    by 0x1092BF: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
+==81080==    by 0x109854: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
 ==81080== 
 ==81080== LEAK SUMMARY:
 ==81080==    definitely lost: 105,790 bytes in 1,890 blocks
@@ -87,7 +112,7 @@ Checking `wordlist.txt` against corpus `testcorpus.txt`
 ==81080== ERROR SUMMARY: 2 errors from 2 contexts (suppressed: 0 from 0)
 ```
 
-Valgrind output running the unit tests:
+\noindent Valgrind output running the unit tests:
 
 ```
 $ valgrind -s --leak-check=full ./test
@@ -102,12 +127,16 @@ Running suite(s): Spell
 ==81525==     in use at exit: 6,922,292 bytes in 123,625 blocks
 ==81525==   total heap usage: 123,643 allocs, 18 frees, 6,936,854 bytes allocated
 ==81525==
-==81525== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are definitely lost in loss record 35 of 35
+==81525== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are 
+definitely lost in loss record 35 of 35
 ==81525==    at 0x483977F: malloc (vg_replace_malloc.c:307)
-==81525==    by 0x10935F: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
-==81525==    by 0x1098DD: test_load_dictionary_fn (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81525==    by 0x10935F: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
+==81525==    by 0x1098DD: test_load_dictionary_fn (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81525==    by 0x488BDED: srunner_run_tagged (in /usr/lib/libcheck.so.0.0.0)
-==81525==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81525==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81525==
 ==81525== LEAK SUMMARY:
 ==81525==    definitely lost: 105,560 bytes in 1,885 blocks
@@ -124,12 +153,16 @@ Running suite(s): Spell
 ==81528==     in use at exit: 6,922,385 bytes in 123,628 blocks
 ==81528==   total heap usage: 123,656 allocs, 28 frees, 6,945,472 bytes allocated
 ==81528==
-==81528== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are definitely lost in loss record 38 of 38
+==81528== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are 
+definitely lost in loss record 38 of 38
 ==81528==    at 0x483977F: malloc (vg_replace_malloc.c:307)
-==81528==    by 0x10935F: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
-==81528==    by 0x109A29: test_check_word_fn (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81528==    by 0x10935F: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
+==81528==    by 0x109A29: test_check_word_fn (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81528==    by 0x488BDED: srunner_run_tagged (in /usr/lib/libcheck.so.0.0.0)
-==81528==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81528==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81528==
 ==81528== LEAK SUMMARY:
 ==81528==    definitely lost: 105,560 bytes in 1,885 blocks
@@ -148,17 +181,24 @@ Running suite(s): Spell
 ==81530==
 ==81530== 230 bytes in 5 blocks are definitely lost in loss record 36 of 40
 ==81530==    at 0x483977F: malloc (vg_replace_malloc.c:307)
-==81530==    by 0x1096E2: check_words (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
-==81530==    by 0x109B6E: test_check_words_fn (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81530==    by 0x1096E2: check_words (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
+==81530==    by 0x109B6E: test_check_words_fn (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81530==    by 0x488BDED: srunner_run_tagged (in /usr/lib/libcheck.so.0.0.0)
-==81530==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81530==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81530==
-==81530== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are definitely lost in loss record 40 of 40
+==81530== 6,921,152 (105,560 direct, 6,815,592 indirect) bytes in 1,885 blocks are
+definitely lost in loss record 40 of 40
 ==81530==    at 0x483977F: malloc (vg_replace_malloc.c:307)
-==81530==    by 0x10935F: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
-==81530==    by 0x109B34: test_check_words_fn (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81530==    by 0x10935F: load_dictionary (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
+==81530==    by 0x109B34: test_check_words_fn (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81530==    by 0x488BDED: srunner_run_tagged (in /usr/lib/libcheck.so.0.0.0)
-==81530==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/test)
+==81530==    by 0x109EA7: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/test)
 ==81530==
 ==81530== LEAK SUMMARY:
 ==81530==    definitely lost: 105,790 bytes in 1,890 blocks
@@ -187,10 +227,9 @@ The memory leaks revealed by Valgrind showed memory allocated by load_dictionary
 Since the caller uses that memory, it is the caller's responsibility to free the memory.
 This commit adds functions for freeing memory allocated for hashtables and misspelled word lists.
 These functions were then called in the spell_check.c main method and the executable check test functions.
+No memory leaks occurred within `spell.c` library code, only in `spell_check.c` code, where I have implemented a main function.
 
-No memory leaks occurred within spell.c library code.
-
-After fixing the memory leaks, this is the Valgrind output running the main function in `spell_check.c` after commit https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194:
+\noindent After fixing the memory leaks, this is the Valgrind output running the main function in `spell_check.c` after commit [https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194](https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194):
 
 ```
 $ valgrind -s --leak-check=full ./spell_check testcorpus.txt wordlist.txt
@@ -211,7 +250,7 @@ Checking `wordlist.txt` against corpus `testcorpus.txt`
 ==8482== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
 ```
 
-This is the output of Valgrind when running unit tests after commit https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194:
+\noindent This is the output of Valgrind when running unit tests after commit [https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194](https://github.com/bgottlob/app-sec-assignment1/commit/01a5725188d6d10fb155968f9bd7641eeb6f8194):
 
 ```
 $ valgrind -s --leak-check=full ./test
@@ -285,15 +324,14 @@ When I ran Valgrind with additional trace flags, I saw that all memory that was 
 This, along with the Valgrind not reporting any memory issues in the `spell_check` executable gives me confidence that my code does not have any memory leaks.
 
 ## Additional Tests
-Additional tests and bug fixes were added in this commit: https://github.com/bgottlob/app-sec-assignment1/commit/c7beb33deb00fb62a86cb1c89c4c46d5d3249cdc
+Additional tests and bug fixes were added in this commit:
 
-The additional tests cover scenarios where tokens are strings whose only characters are digits or special characters, and to verify that words split by delimiters are considered to be spelled correctly.
+[https://github.com/bgottlob/app-sec-assignment1/commit/c7beb33deb00fb62a86cb1c89c4c46d5d3249cdc](https://github.com/bgottlob/app-sec-assignment1/commit/c7beb33deb00fb62a86cb1c89c4c46d5d3249cdc)
 
-These tests found two bugs:
+The additional tests cover scenarios where tokens are strings whose only characters are digits or special characters, and to verify that words split by delimiters are considered to be spelled correctly. These tests found two bugs:
 
 1. Strings with no alphabetic characters were considered misspelled
-2. Hyphenated strings were evaluated as one misspelled word rather than
-   as multiple words
+2. Hyphenated strings were evaluated as one misspelled word rather than as multiple words
 
 ## Fuzzing
 
@@ -304,7 +342,7 @@ Fuzzing exposed two bugs: one causing a stack smashing crash and the other causi
 ### First Bug - Stack Smashing
 
 Multiple parallel instances of AFL found testcases that caused crashes.
-The first I checked was in the `crashes` directory of the `fuzzer02` instance.
+The first I checked was in the `crashes` directory of the `fuzzer02` AFL instance.
 
 To debug, I utilized `afl-tmin` tool, which shrinks testcases into their smallest and simplest possible forms to reproduce the same issue.
 The testcase from shrinking looked like the following:
@@ -376,7 +414,7 @@ After fixing the bug and verifying manually that the fixes work, I reran the exi
 
 ### Second Bug - Invalid Hash Value
 
-After fixing the first bug, I tested the crashing input that was found by fuzzing by fuzzer03 on a different processor core.
+After fixing the first bug, I tested the crashing input that was found by fuzzing by `fuzzer03` on a different processor core.
 I started again by shrinking the testcase and running it through my `spell_check` binary.
 This error from the program was a segmentation fault, so I then ran it through Valgrind.
 Valgrind presented a lot of output, but I found this to be the most helpful:
@@ -384,10 +422,14 @@ Valgrind presented a lot of output, but I found this to be the most helpful:
 ```
 ==336760== Invalid read of size 1
 ==336760==    at 0x49E49A0: __strcmp_avx2 (in /usr/lib/libc-2.31.so)
-==336760==    by 0x1094CD: check_word_exact (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
-==336760==    by 0x109617: check_word (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
-==336760==    by 0x109771: check_words (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
-==336760==    by 0x109A57: main (in /home/bgottlob/Dropbox/School/summer-2020/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x1094CD: check_word_exact (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x109617: check_word (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x109771: check_words (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
+==336760==    by 0x109A57: main (in /home/bgottlob/Dropbox/School/summer-2020
+/application-security/app-sec-assignment1/spell_check)
 ==336760==  Address 0x6f746e616b2f6c61 is not stack'd, malloc'd or (recently) free'd
 ```
 
@@ -412,7 +454,7 @@ Like for the first bug, I added this shrunk testcase as a unit test, except this
 
 ### After the Bug Fixes
 
-This commit contains fixes to both of the bugs found from fuzzing: https://github.com/bgottlob/app-sec-assignment1/commit/d2b42a817ce8c503676db2b813dc849e182fbde0
+This commit contains fixes to both of the bugs found from fuzzing: [https://github.com/bgottlob/app-sec-assignment1/commit/d2b42a817ce8c503676db2b813dc849e182fbde0](https://github.com/bgottlob/app-sec-assignment1/commit/d2b42a817ce8c503676db2b813dc849e182fbde0).
 After making this commit, I ran four parallel AFL instances on the changes.
 After running for nearly two hours with many completed cycles, there were no crashes or hangs.
 The results of this second round of fuzzing are contained in the `afl-findings-after-fixes` directory.
